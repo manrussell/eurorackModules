@@ -7,12 +7,15 @@
  *   by Collin Cunningham - makezine.com, narbotic.com
  *
  * This is sample program. Do not expect perfect behavior.
+ *
+ * Edit by Me also
  *******************************************************************************
  */
 
 #include <usbh_midi.h>
 #include <usbhub.h>
 
+// ToDo explain this, can we only havew 1 UART out?
 #ifdef USBCON
 #define _MIDI_SERIAL_PORT Serial1
 #else
@@ -31,29 +34,28 @@
 //////////////////////////
 
 USB Usb;
-USBH_MIDI  Midi(&Usb);
+USBH_MIDI Midi(&Usb);
 
 void MIDI_poll();
 
-void setup()
-{
+void setup() {
   // initialize digital pin LED_BUILTIN as an output.
   pinMode(LED_BUILTIN, OUTPUT);
 
   _MIDI_SERIAL_PORT.begin(31250);
 
   if (Usb.Init() == -1) {
-    while (1); //halt
-  }//if (Usb.Init() == -1...
-  delay( 200 );
+    while (1)
+      ;  //halt
+  }
+  delay(200);
 }
 
-void loop()
-{
+// ToDo this doesn't look very optimised
+void loop() {
   Usb.Task();
 
-  if ( Midi ) 
-  {
+  if (Midi) {
     digitalWrite(LED_BUILTIN, LOW);
     MIDI_poll();
   }
@@ -61,16 +63,15 @@ void loop()
   //delayMicroseconds(1000);
 }
 
-// Poll USB MIDI Controler and send to serial MIDI
-void MIDI_poll()
-{
-  uint8_t outBuf[ 3 ];
-  uint8_t size;
+uint8_t outBuf[3];
+uint8_t size;
 
+// Poll USB MIDI Controler and send to serial MIDI
+void MIDI_poll() {
   do {
-    if ( (size = Midi.RecvData(outBuf)) > 0 ) 
-    {
-      digitalWrite(LED_BUILTIN, HIGH);  // turn the LED on (HIGH is the voltage level)
+    if ((size = Midi.RecvData(outBuf)) > 0) {
+      digitalWrite(LED_BUILTIN, HIGH);
+      
       //MIDI Output
       _MIDI_SERIAL_PORT.write(outBuf, size);
 #if ENABLE_MIDI_SERIAL_FLUSH
